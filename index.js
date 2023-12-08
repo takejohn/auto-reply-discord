@@ -29,7 +29,7 @@ function runSqlAsync(database, sql, ...param) {
 const database = new sqlite3.Database("./data/auto-reply.db");
 
 (async function() {
-    await runSqlAsync(database, `PRAGMA foregin_keys = true;`);
+    await runSqlAsync(database, `PRAGMA foreign_keys = true;`);
     await runSqlAsync(database, `CREATE TABLE IF NOT EXISTS reply_messages(
         id integer primary key autoincrement,
         message text
