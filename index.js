@@ -14,6 +14,18 @@ function runSqlAsync(database, sql, ...param) {
         (err, rows) => err ? reject(err) : resolve(rows)));
 }
 
+/* resources フォルダ内のファイルを data フォルダにコピーする */
+(function() {
+    const resourceFileNames = fs.readdirSync("./resources");
+    for (const resourceFileName of resourceFileNames) {
+        try {
+            fs.copyFileSync(`./resources/${resourceFileName}`, `./data/${resourceFileName}`, fs.constants.COPYFILE_EXCL);
+        } catch (e) {
+            // data フォルダにファイルが存在するので何もしない
+        }
+    }
+})();
+
 const database = new sqlite3.Database("./data/auto-reply.db");
 
 (async function() {
@@ -34,8 +46,8 @@ const client = new Client({
     intents: Object.values(GatewayIntentBits).reduce((a, b) => a | b)
 });
 
-const TOKEN = fs.readFileSync(".token", "utf-8");
+const config = JSON.parse(fs.readFileSync("./data/config.json", "utf-8"));
 
 client.on("ready", () => console.log(`Logged in as ${client.user.tag}`));
 
-client.login(TOKEN);
+client.login(config.token);
