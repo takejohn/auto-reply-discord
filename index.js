@@ -31,7 +31,7 @@ const database = new sqlite3.Database("./data/auto-reply.db");
 })();
 
 const client = new Client({
-  intents: Object.values(GatewayIntentBits).reduce((a, b) => a | b)
+    intents: Object.values(GatewayIntentBits).reduce((a, b) => a | b)
 });
 
 const TOKEN = fs.readFileSync(".token", "utf-8");
