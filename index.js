@@ -55,7 +55,7 @@ const config = JSON.parse(fs.readFileSync("./data/config.json", "utf-8"));
 
 const rest = new REST({version: 10}).setToken(config.token);
 
-const commandAutoReply = new SlashCommand(new SlashCommandBuilder()
+const commandAddReply = new SlashCommand(new SlashCommandBuilder()
     .setName("add-reply")
     .setDescription("自動リプライのパターンを追加します。")
     .addStringOption(option => option
@@ -89,7 +89,7 @@ const commandAutoReply = new SlashCommand(new SlashCommandBuilder()
 client.on("ready", function() {
     console.log(`Logged in as ${client.user.tag}`);
     for (const guildId of config.guild_ids) {
-        SlashCommand.putGuildCommands(rest, client, guildId, commandAutoReply);
+        SlashCommand.putGuildCommands(rest, client, guildId, commandAddReply);
     }
 });
 
