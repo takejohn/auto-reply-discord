@@ -44,14 +44,23 @@ class SlashCommand {
         await rest.put(Routes.applicationGuildCommands(client.application.id, guildId), {
             body: Array.from(commands).map(command => command.#jsonBody)
         });
+        this.#implementCommands(client, guildId, ...commands)
+    }
 
+    /**
+     * ギルドに対してコマンドを実装する。
+     * @param {Client} client bot のクライアント
+     * @param {string} guildId コマンドを追加するギルド ID
+     * @param {...SlashCommand} commands 実装を設定するコマンド
+     */
+    static async #implementCommands(client, guildId, ...commands) {
         /** @type {Map<string, SlashCommand>} */
         const nameCommandMap = new Map();
         for (const command of commands) {
             nameCommandMap.set(command.#jsonBody.name, command);
         }
         client.on("interactionCreate", async function(interaction) {
-            if (!interaction.isChatInputCommand()) {
+            if (interaction.guildId != guildId || !interaction.isChatInputCommand()) {
                 return;
             }
             const command = nameCommandMap.get(interaction.commandName);
