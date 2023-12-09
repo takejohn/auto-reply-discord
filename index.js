@@ -86,10 +86,34 @@ const commandAddReply = new SlashCommand(new SlashCommandBuilder()
         interaction.reply(`自動リプライのパターンを追加しました。\n\`${keyword}\` → \`${content}\``);
     });
 
+const commandRemoveReply = new SlashCommand(new SlashCommandBuilder()
+    .setName("remove-reply")
+    .setDescription("自動リプライのパターンを削除します。")
+    .addStringOption(option => option
+        .setName("keyword")
+        .setDescription("リプライ対象のメッセージ")
+        .setRequired(true)),
+    async function(interaction) {
+        const guildId = interaction.guildId;
+        const keyword = interaction.options.getString("keyword");
+        const selectResult = await runSqlAsync(database, `SELECT reply_id FROM reply_contents WHERE guild_id = ? AND reply_id IN (
+            SELECT reply_id FROM reply_keywords WHERE keyword = ?
+        );`, guildId, keyword);
+        if (selectResult.length == 0) {
+            interaction.reply("そのキーワードに対してはリプライが設定されていません。");
+            return;
+        }
+        const replyId = selectResult[0].reply_id;
+        await runSqlAsync(database, `DELETE FROM reply_keywords WHERE reply_id = ?;`, replyId);
+        await runSqlAsync(database, `DELETE FROM reply_contents WHERE reply_id = ?;`, replyId);
+        interaction.reply(`自動リプライのパターンを削除しました。\n\`${keyword}\``);
+    })
+
 client.on("ready", function() {
     console.log(`Logged in as ${client.user.tag}`);
     for (const guildId of config.guild_ids) {
-        SlashCommand.putGuildCommands(rest, client, guildId, commandAddReply);
+        SlashCommand.putGuildCommands(rest, client, guildId,
+            commandAddReply, commandRemoveReply);
     }
 });
 
