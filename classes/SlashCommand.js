@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, RESTPostAPIChatInputApplicationCommandsJSONBody, REST, Routes, Client, ChatInputCommandInteraction } = require("discord.js");
+const { Routes } = require("discord.js");
 
 /**
  * スラッシュコマンドを表すオブジェクト
@@ -6,19 +6,19 @@ const { SlashCommandBuilder, RESTPostAPIChatInputApplicationCommandsJSONBody, RE
 class SlashCommand {
 
     /**
-     * @type {RESTPostAPIChatInputApplicationCommandsJSONBody}
+     * @type {import("discord.js").RESTPostAPIChatInputApplicationCommandsJSONBody}
      */
     #jsonBody;
 
     /**
-     * @type {((interaction: ChatInputCommandInteraction<CacheType>) => void) | undefined}
+     * @type {((interaction: import("discord.js").ChatInputCommandInteraction<CacheType>) => void) | undefined}
      */
     #executeFunc;
 
     /**
      * スラッシュコマンドを表すオブジェクトを作成する。
-     * @param {SlashCommandBuilder} builder スラッシュコマンドの元となるビルダーオブジェクト
-     * @param {((interaction: ChatInputCommandInteraction<CacheType>) => void) | undefined} executeFunc コマンドの実行時に行う処理
+     * @param {import("discord.js").SlashCommandBuilder} builder スラッシュコマンドの元となるビルダーオブジェクト
+     * @param {((interaction: import("discord.js").ChatInputCommandInteraction<CacheType>) => void) | undefined} executeFunc コマンドの実行時に行う処理
      */
     constructor(builder, executeFunc) {
         this.#jsonBody = builder.toJSON();
@@ -27,7 +27,7 @@ class SlashCommand {
 
     /**
      * コマンドを実行する。
-     * @param {ChatInputCommandInteraction<CacheType>} interaction interactionCreate イベントの内容
+     * @param {import("discord.js").ChatInputCommandInteraction<CacheType>} interaction interactionCreate イベントの内容
      */
     async execute(interaction) {
         this.#executeFunc(interaction);
@@ -35,23 +35,23 @@ class SlashCommand {
 
     /**
      * ギルドにコマンドを追加する。
-     * @param {REST} rest エンドポイントのハンドラを管理する REST オブジェクト
-     * @param {Client} client bot のクライアント
+     * @param {import("discord.js").REST} rest エンドポイントのハンドラを管理する REST オブジェクト
+     * @param {import("discord.js").Client} client bot のクライアント
      * @param {string} guildId コマンドを追加するギルド ID
-     * @param {...SlashCommand} commands 追加するコマンド
+     * @param {...import("discord.js").SlashCommand} commands 追加するコマンド
      */
     static async putGuildCommands(rest, client, guildId, ...commands) {
         await rest.put(Routes.applicationGuildCommands(client.application.id, guildId), {
             body: Array.from(commands).map(command => command.#jsonBody)
         });
-        this.#implementCommands(client, guildId, ...commands)
+        this.#implementCommands(client, guildId, ...commands);
     }
 
     /**
      * ギルドに対してコマンドを実装する。
-     * @param {Client} client bot のクライアント
+     * @param {import("discord.js").Client} client bot のクライアント
      * @param {string} guildId コマンドを追加するギルド ID
-     * @param {...SlashCommand} commands 実装を設定するコマンド
+     * @param {...import("discord.js").SlashCommand} commands 実装を設定するコマンド
      */
     static async #implementCommands(client, guildId, ...commands) {
         /** @type {Map<string, SlashCommand>} */
